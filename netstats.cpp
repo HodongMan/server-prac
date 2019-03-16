@@ -57,3 +57,8 @@ void NetStats::destroy( void ) noexcept
 		ourInstance = nullptr;
 	}
 }
+
+void NetStats::TCPSent( unsigned int nBytes ) noexcept
+{
+	int pos = static_cast<int>()
+}
