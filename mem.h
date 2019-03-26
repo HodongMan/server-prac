@@ -35,7 +35,7 @@ void			getFreeMemoryDescription( char* writeHere ) noexcept;
 	#define assert(X) do {} while(0)
 #endif
 
-#define MC_MEM_DONT_ADD_PDB_MARKER "!!--!![[[DONT ADD PDB TO ME]]]!!--!!"
+#define MEM_DONT_ADD_PDB_MARKER "!!--!![[[DONT ADD PDB TO ME]]]!!--!!"
 
 struct TempMemStats
 {
@@ -69,23 +69,23 @@ private:
 	void* myData;
 };
 
-#ifdef MC_ENABLE_MC_MEM
-	#define MC_MEM_CRTDBG
+#ifdef ENABLE_MC_MEM
+	#define MEM_CRTDBG
 
-	#ifdef MC_MEM_CRTDBG
-		#ifdef MC_MEM_INTERNAL
+	#ifdef MEM_CRTDBG
+		#ifdef MEM_INTERNAL
 			#error CAN'T SPECIFY BOTH MC_MEM_CRTDBG AND MC_MEM_INTERNAL
 		#endif 
 	#endif 
 
-	#ifdef MC_MEM_CRTDBG
+	#ifdef MEM_CRTDBG
 		#ifndef DEBUG_NEW
 			#include <crtdbg.h>
 			#define new new(_NORMAL_BLOCK, __FILE__, __LINE__)
 		#endif 
 	#endif 
 
-	#ifdef MC_MEM_INTERNAL
+	#ifdef MEM_INTERNAL
 
 		#ifdef  __cplusplus
 		extern "C" {
@@ -149,12 +149,12 @@ private:
 #undef assert
 
 #ifndef _RELEASE_
-		bool __cdecl MC_Assert( const char* aFile, int aLine, const char* aString, bool* anIgnoreFlag );
+		bool __cdecl Assert( const char* aFile, int aLine, const char* aString, bool* anIgnoreFlag );
 
 #ifndef NO_ASSERTS		
 #define assert(X) do { \
 				static bool ignoreAlwaysFlag = false; \
-				if(!(X) && !ignoreAlwaysFlag && MC_Assert(__FILE__, __LINE__, #X, &ignoreAlwaysFlag)) \
+				if(!(X) && !ignoreAlwaysFlag && Assert(__FILE__, __LINE__, #X, &ignoreAlwaysFlag)) \
 				_asm { int 3 } \
 			} while(0)	
 #else
