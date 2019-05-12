@@ -5,7 +5,7 @@
 #endif
 
 #include "time.h"
-#include "mt_mutex.h"
+//#include "mt_mutex.h"
 
 #define NUM_TIME_AVERAGEFRAMES 3
 

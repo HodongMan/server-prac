@@ -5,7 +5,7 @@
 
 NetStats* NetStats::ourInstance = nullptr;
 
-NetStats::NetStats( void ) noexcept
+NetStats::NetStats( void )
 {
 
 }
@@ -60,5 +60,5 @@ void NetStats::destroy( void ) noexcept
 
 void NetStats::TCPSent( unsigned int nBytes ) noexcept
 {
-	int pos = static_cast<int>()
+	int pos = static_cast<int>( nBytes );
 }

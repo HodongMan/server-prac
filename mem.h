@@ -149,7 +149,7 @@ private:
 #undef assert
 
 #ifndef _RELEASE_
-		bool __cdecl Assert( const char* aFile, int aLine, const char* aString, bool* anIgnoreFlag );
+		bool __cdecl Assert( const char* aFile, int aLine, const char* aString, bool* anIgnoreFlag ) noexcept;
 
 #ifndef NO_ASSERTS		
 #define assert(X) do { \

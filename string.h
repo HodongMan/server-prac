@@ -321,6 +321,56 @@ public:
 		return Str<wchar_t>( string );
 	}
 
+	protected:
+		void		setBuffer( C* aPointer ) noexcept { internalSetBuffer( *this, aPointer); }
+		void		setBuffer( int aSize ) noexcept { internalSetBufferSize( *this, size ); }
 
+		void		reallocData( int aSize ) noexcept;
+		void		allocData( int aSize ) noexcept;
+		void		delloc( void ) noexcept;
+		void		zeroMembers( void ) noexcept;
 
+		union
+		{
+			C*	myDynamicPointer;			
+			int* myLength;					
+			C myBuffer[(S > 0) ? S : 1];	
+		};
+
+		template<class C, int S>	static void	internalSetBuffer( Str<C, S>& aStr, C* aPointer ) { assert( 0 && "not allowed on static strings!" ); }
+		template<class C, int S>	static C*	internalGetBuffer( Str<C, S>& aStr ) { return aStr.myBuffer; }
+		template<class C, int S>	static const C*	internalGetBuffer( const Str<C, S>& aStr ) { return aStr.myBuffer; }
+		template<class C, int S>	static int	internalGetBufferSize( const Str<C, S>& aStr ) { return S; }
+		template<class C, int S>	static void	internalSetBufferSize( Str<C, S>& aStr, int aSize ) { assert( 0 && "not allowed on static strings!" ); }
+		template<class C, int S>	static void	internalReserve( Str<C, S>& aStr, int aLength ) { assert( aLength < S ); }
+
+		template<class C>			static void	internalSetBuffer( Str<C, 0>& aStr, C* aPointer ) { aStr.myDynamicPointer = aPointer; }
+		template<class C>			static C*	internalGetBuffer( Str<C, 0>& aStr ) { return aStr.myDynamicPointer; }
+		template<class C>			static const C*	internalGetBuffer( const Str<C, 0>& aStr ) { return aStr.myDynamicPointer; }
+		template<class C>			static int	internalGetBufferSize( const Str<C, 0>& aStr ) { return ( STRING_IS_NOT_NULL( aStr.myDynamicPointer ) ) ? *( int* )( aStr.myDynamicPointer - sizeof( int ) / sizeof( C ) ) : 0; }
+		template<class C>			static void	internalSetBufferSize( Str<C, 0>& aStr, int aSize ) { if ( STRING_IS_NOT_NULL( aStr.myDynamicPointer ) ) *( int* )( aStr.myDynamicPointer - sizeof( int ) / sizeof( C ) ) = aSize; }
+		template<class C>			static void	internalReserve( Str<C, 0>& aStr, int aLength ) { if ( internalGetBufferSize( aStr ) <= aLength ) aStr.ReallocData( aLength ); }
+
+		template<class C>		C internalConvertChar( TCHAR aChar ) const noexcept; 
+		template<class C>		C internalConvertChar( wchar_t aChar ) const noexcept;
+
+		template<>				TCHAR	internalConvertChar<TCHAR>( TCHAR aChar ) const noexcept { return aChar; }
+		template<>				TCHAR	internalConvertChar<TCHAR>( wchar_t aChar ) const noexcept { return TCHAR( aChar ); }
+
+		template<>				wchar_t	internalConvertChar<wchar_t>( TCHAR aChar ) const { return wchar_t( aChar ); }
+		template<>				wchar_t	internalConvertChar<wchar_t>( wchar_t aChar ) const { return aChar; }
+
+		static void						internalMakeUpper( TCHAR* aPointer, int aBufferSize ) { if ( aPointer && aBufferSize ) _tcsupr_s( aPointer, aBufferSize ); }
+		static void						internalMakeLower( TCHAR* aPointer, int aBufferSize ) { if ( aPointer && aBufferSize ) _tcslwr_s( aPointer, aBufferSize ); }
+		static int						internalCompare( const TCHAR* aString1, const TCHAR* aString2 ) { return _tcscmp( aString1, aString2 ); }
+		static int						internalCompareNoCase( const TCHAR* aString1, const TCHAR* aString2 ) { return _tcsicmp( aString1, aString2 ); }
+		static bool						internalEndsWith( const TCHAR* aString1, const TCHAR* aString2 ) { size_t len1 = _tcslen( aString1 ); size_t len2 = _tcslen(aString2); return len1 >= len2 ? (_tcscmp(aString1 + len1 - len2, aString2) == 0) : false; }
+		static bool						internalEndsWithNoCase( const TCHAR* aString1, const TCHAR* aString2 ) { size_t len1 = _tcslen( aString1 ); size_t len2 = _tcslen(aString2); return len1 >= len2 ? (_tcsicmp(aString1 + len1 - len2, aString2) == 0) : false; }
+		static bool						internalBeginsWith( const TCHAR* aString1, const TCHAR* aString2 ) { size_t len1 = _tcslen( aString1 ); size_t len2 = _tcslen(aString2); return len1 >= len2 ? (_tcsncmp(aString1, aString2, len2) == 0) : false; }
+		static bool						internalBeginsWithNoCase( const TCHAR* aString1, const TCHAR* aString2 ) { size_t len1 = _tcslen( aString1 ); size_t len2 = _tcslen(aString2); return len1 >= len2 ? (_tcsncicmp(aString1, aString2, len2) == 0) : false; }
+		static int						internalFind( const TCHAR* aString1, const TCHAR* aString2)
+		{
+			const TCHAR* ret = _tcsstr(aString1, aString2);
+			return ret ? int(ret - aString1) : -1;
+		}
 };

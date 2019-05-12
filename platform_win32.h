@@ -10,14 +10,14 @@
 #define _WIN32_WINNT 0x500
 #endif
 
-#include "mc_globaldefines.h"
-#include "mc_mem.h"
-#include "mc_string.h"
+#include "globaldefines.h"
+#include "mem.h"
+#include "string.h"
 
 #include <windows.h>
 
-MC_String MC_ComputerUserName();
-MC_String MC_ComputerName();
+//MC_String computerUserName();
+//MC_String computerName();
 
 inline void MC_GetCursorPos(int& x, int& y)
 {
