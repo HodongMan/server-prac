@@ -2,7 +2,6 @@
 #include "ThreadingTools.h"
 #include "Mutex.h"
 #include "Profiler.h"
-#include "MT_ThreadingTools.h"
 
 #include "Thread.h"
 #include "debug.h"
@@ -114,6 +113,22 @@ struct DebugThreadInfo
 	bool			myCriticalWaiting;
 };
 
+
+struct DebugThreadInfo
+{
+	DebugThreadInfo()
+	{
+		myName[0] = '\0';
+		myThreadId = 0;
+		mySemaWaiting = false;
+		myCriticalWaiting = false;
+	}
+	char			myName[128];
+	unsigned int	myThreadId;
+	bool			mySemaWaiting;
+	bool			myCriticalWaiting;
+};
+
 DebugThreadInfo locDebugThreadInfo[THREAD_TOOLS_ABSOLUTE_MAX_NUM_THREADS];
 
 void ThreadingTools::setSemaphoreStatus( bool aWaiting ) noexcept
@@ -130,7 +145,7 @@ void ThreadingTools::setCriticalSectionStatus( bool aWaiting ) noexcept
 
 #endif //THREAD_TOOLS_DEBUG
 
-void ThreadingTools::setCurrentThreadName( const char* aName ) noexcept
+void ThreadingTools::setCurrentThreadName( const char* aName )
 {
 #ifndef _RELEASE_
 	typedef struct tagTHREADNAME_INFO
@@ -140,5 +155,52 @@ void ThreadingTools::setCurrentThreadName( const char* aName ) noexcept
 		DWORD dwThreadID; 
 		DWORD dwFlags; 
 	} THREADNAME_INFO;
+
+	THREADNAME_INFO info;
+
+	info.dwType = 0x1000;
+	info.szName = aName;
+	info.dwThreadID = -1;
+	info.dwFlags = 0;
+
+	__try {
+		RaiseException( 0x406D1388, 0, sizeof(info) / sizeof(DWORD), (DWORD*)&info );
+	}
+	__except ( EXCEPTION_CONTINUE_EXECUTION )
+	{
+	}
+
+#ifdef THREAD_TOOLS_DEBUG
+	unsigned int idx = getMyThreadIndex();
+	strcpy( locDebugThreadInfo[idx].myName, aName );
+	locDebugThreadInfo[idx].myThreadId = GetCurrentThreadId();
 #endif
+
+	PROFILER_SET_THREAD_NAME( aName );
+#endif
+}
+
+static __declspec( thread ) long locMyThreadIndex = -1;
+static volatile long locThreadCount = 0;
+
+int ThreadingTools::getMyThreadIndex( void ) noexcept
+{
+	if ( locMyThreadIndex == -1 )
+	{
+		locMyThreadIndex = increment( &locThreadCount ) - 1;
+
+		assert( ( locMyThreadIndex >= 0 ) && ( locMyThreadIndex < THREAD_TOOLS_ABSOLUTE_MAX_NUM_THREADS ) );
+	}
+
+	return locMyThreadIndex;
+}
+
+long ThreadingTools::increment(long volatile* aValue ) noexcept
+{
+	return _InterlockedIncrement( aValue );
+}
+
+long ThreadingTools::decrement( long volatile* aValue ) noexcept
+{
+	return _InterlockedDecrement( aValue );
 }
