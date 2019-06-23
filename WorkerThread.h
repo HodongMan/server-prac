@@ -8,6 +8,7 @@ class Supervisor;
 class WorkerThread : public Thread
 {
 	friend class Supervisor;
+public:
 
 	WorkerThread( void );
 	~WorkerThread( void );

@@ -32,7 +32,7 @@ public:
 private:
 	static const unsigned int MAX_NUM_THREADS = 16;
 	WorkerThread* _threads[MAX_NUM_THREADS];
-	HANDLE _competionPort;
+	HANDLE _completionPort;
 	int _relativePrioirty;
 
 	static Supervisor* defaultInstance;
