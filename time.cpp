@@ -5,7 +5,7 @@
 #endif
 
 #include "time.h"
-//#include "mt_mutex.h"
+#include "mutex.h"
 
 #define NUM_TIME_AVERAGEFRAMES 3
 
@@ -43,9 +43,10 @@ static const int TIME_HISTORY_SIZE = 1024;
 static unsigned int locTimeHistory[TIME_HISTORY_SIZE] = {0};
 static unsigned int locTimeHistoryWriteIndex = 0;
 
-static MT_Mutex& GetTimeMutex()
+static Mutex& getTimeMutex( void ) noexcept
 {
-	static MT_Mutex timeMutex;
+	static Mutex timeMutex;
+
 	return timeMutex;
 }
 
@@ -54,7 +55,7 @@ double (__cdecl* MI_Time::ourTimeUpdateOverrideCallback)(double) = 0;
 
 MI_Time::MI_Time()
 {
-	MT_MutexLock lock(GetTimeMutex());
+	MutexLock lock( getTimeMutex() );
 
 	ourElapsedTime = 0.0f;
 	ourCurrentTime = 0.0f;
@@ -176,7 +177,7 @@ void MI_Time::Calibrate()
 
 MI_Time::~MI_Time()
 {
-	MT_MutexLock lock(GetTimeMutex());
+	MutexLock lock( getTimeMutex() );
 
 	delete [] ourInternalElapsedTimes;
 
@@ -189,7 +190,7 @@ MI_Time::~MI_Time()
 
 bool MI_Time::Create()
 {
-	MT_MutexLock lock(GetTimeMutex());
+	MutexLock lock( getTimeMutex() );
 
 	if(!ourInstance)
 		ourInstance = new MI_Time();
@@ -200,7 +201,7 @@ bool MI_Time::Create()
 
 void MI_Time::Destroy()
 {
-	MT_MutexLock lock(GetTimeMutex());
+	MutexLock lock( getTimeMutex() );
 
 	if(ourInstance)
 	{
@@ -228,7 +229,7 @@ void MI_Time::GetExactTime(MI_TimeUnit* aReturnTime)
 
 bool MI_Time::GetQPC(MI_TimeUnit* aReturnTime)
 {
-	MT_MutexLock lock(GetTimeMutex());
+	MutexLock lock( getTimeMutex() );
 
 	static MI_TimeUnit prevQpc;
 	static DWORD prevTime;

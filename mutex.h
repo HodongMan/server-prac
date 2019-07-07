@@ -5,7 +5,7 @@
 
 class Mutex
 {
-	Mutex( int spinLockCount = 0);
+	Mutex( int spinLockCount = 0 );
 	virtual ~Mutex( void );
 
 	void lock( void ) noexcept;
