@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <windows.h>
+#include "HybridArray.h"
 
 /*
 #include "mc_mem.h"
