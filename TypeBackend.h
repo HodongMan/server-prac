@@ -1,5 +1,7 @@
 #pragma once
 
+#define SLOT_COUNT 2
+
 enum class LogLevel : int
 {
 	LOG_LEVEL_FATAL,

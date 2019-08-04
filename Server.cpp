@@ -3,7 +3,7 @@
 #include "pch.h"
 #include "ConsoleBackend.h"
 //#include "FileBackend.h"
-//#include "Logger.h"
+#include "Logger.h"
 
 void autoRestart( int argc, const char* argv[] )
 {
@@ -36,6 +36,8 @@ int main( int argc, const char* argv[] )
 	}
 
 	ConsoleBackend*		backend = new ConsoleBackend( true, false );
+	Logger::getSlot( 0 )->setLevel( LogLevel::LOG_LEVEL_DEBUG );
+	Logger::getSlot( 0 )->addBackend( backend );
 
 	while (true);
 }
